@@ -258,114 +258,94 @@
     <!-- Ứng dụng JavaScript -->
     <script>
         // 1. DỮ LIỆU MÔ PHỎNG TỪ FILE CSV CUNG CẤP (Bao gồm VAT 5% tính toán từ snippet)
-        const products = [
-    // --- NHÓM GẠO ---
-    { id: 1, name: "Gạo Nếp Nhung Quyết Huệ 50kg/bao", unit: "Kg", price: 25800, priceVAT: 27090, note: "Nếp dẻo dùng nấu xôi, chè, bánh" },
-    { id: 2, name: "Gạo Nếp Hoa Vàng Quyết Huệ 50kg/bao", unit: "Kg", price: 25600, priceVAT: 26880, note: "Nếp thơm hạt tròn, dùng đồ xôi" },
-    { id: 3, name: "Gạo Nếp Gia Lai 60kg/bao", unit: "Kg", price: 18900, priceVAT: 19845, note: "Nếp dẻo dùng nấu xôi, chè, bánh" },
-    { id: 4, name: "Gạo Nếp Đồi Quyết Huệ 50kg/bao", unit: "Kg", price: 26300, priceVAT: 27615, note: "Nếp dẻo truyền thống" },
-    { id: 5, name: "Gạo Lứt Đen 50kg/bao", unit: "Kg", price: 16800, priceVAT: 17640, note: "Gạo lứt nguyên cám, dùng nấu cơm dinh dưỡng" },
-    { id: 6, name: "Gạo Lứt Đen ( chữ M ) 50kg/bao", unit: "Kg", price: 17800, priceVAT: 18690, note: "Gạo lứt đen loại chọn" },
-    { id: 7, name: "Gạo Lứt Huyết Rồng", unit: "Kg", price: 14200, priceVAT: 14910, note: "Gạo lứt đỏ giàu dinh dưỡng" },
-    { id: 8, name: "Gạo Nếp Cẩm Sịn 50kg/bao", unit: "Kg", price: 24300, priceVAT: 25515, note: "Nếp cẩm dùng nấu chè, xôi" },
-
-    // --- NHÓM NGÔ ---
-    { id: 10, name: "Ngô nếp dẹt đẹp 60kg/bao", unit: "Kg", price: 31600, priceVAT: 33180, note: "Ngô dẹt dùng nấu chè, cháo" },
-    { id: 11, name: "Ngô Hạt Đồng Giao hộp giấy", unit: "Thùng", price: 244400, priceVAT: 263952, note: "Ngô ngọt đóng hộp dùng chế biến món khai vị" },
-    { id: 12, name: "Ngô nghiền đồng giao ( 24 Hộp/ Thùng )", unit: "Thùng", price: 214400, priceVAT: 231552, note: "Ngô xay nhỏ dùng nấu cháo, súp" },
-    { id: 13, name: "Ngô Hạt Asean Thanh An 24lon/ T", unit: "Thùng", price: 253400, priceVAT: 273672, note: "Ngô ngọt đóng hộp dùng chế biến món khai vị" },
-    { id: 14, name: "Ngô Bỏng KING-POP 22.68kg/bao", unit: "Bao", price: 629900, priceVAT: 661395, note: "Hạt bắp làm bỏng ngô" },
-    { id: 15, name: "Ngô Bỏng KING-POP Nấm 22.68kg/bao", unit: "Bao", price: 734800, priceVAT: 771540, note: "Hạt bắp nổ dạng nấm" },
-
-    // --- NHÓM ĐẬU & ĐỖ ---
-    { id: 16, name: "Đậu xanh nguyên hạt", unit: "Kg", price: 36500, priceVAT: 38325, note: "Đậu xanh dùng nấu chè, cháo" },
-    { id: 17, name: "HH Đỗ Hà Lan Xanh 25kg/bao", unit: "Kg", price: 18200, priceVAT: 19110, note: "Đậu Hà Lan khô, ngâm làm cơm rang, các món xào" },
-    { id: 18, name: "Đỏ nhỏ bao tranh ảnh", unit: "Kg", price: 37900, priceVAT: 39795, note: "Đậu đỏ nấu chè" },
-    { id: 19, name: "Đỏ to Sơn La 25kg/bao", unit: "Kg", price: 30000, priceVAT: 31500, note: "" },
-    { id: 21, name: "HH Đen Xanh Lòng Nhỏ Vụ 10/2025 50kg", unit: "Kg", price: 45000, priceVAT: 45000, note: "dùng nấu chè" },
-    { id: 22, name: "HH.Đậu Đen xanh lòng to Mới 50kg/bao", unit: "Kg", price: 37600, priceVAT: 37600, note: "" },
-    { id: 23, name: "Đậu đen trắng lòng sơn la", unit: "Kg", price: 34000, priceVAT: 34000, note: "" },
-    { id: 24, name: "Đỗ mộc 999 bao bóng tím 25kg/bao", unit: "Kg", price: 39700, priceVAT: 41685, note: "Đậu xanh đã bóc vỏ" },
-    { id: 25, name: "Đỗ xanh tách đôi- A2 25kg/bao", unit: "Kg", price: 34300, priceVAT: 36015, note: "Đậu xanh vỡ đôi còn vỏ" },
-    { id: 26, name: "Đỗ xanh tách đôi- A3 25kg/bao", unit: "Kg", price: 32800, priceVAT: 34440, note: "" },
-    { id: 28, name: "Đỗ mộc DOXACO bao đỏ", unit: "Kg", price: 41300, priceVAT: 43365, note: "Đậu xanh đã bóc vỏ" },
-    { id: 30, name: "Đỗ Mộc 999 Bao Trong Cam 25kg/bao", unit: "Kg", price: 35300, priceVAT: 37065, note: "" },
-
-    // --- NHÓM VỪNG ---
-    { id: 32, name: "Vừng Đen GÓI 25kg/bao", unit: "Kg", price: 100900, priceVAT: 105945, note: "" },
-    { id: 33, name: "Vừng Vàng GÓI 25kg/bao", unit: "Kg", price: 66400, priceVAT: 69720, note: "" },
-    { id: 34, name: "Vừng Đen ĐẸP Yến Để 25kg/bao", unit: "Kg", price: 79600, priceVAT: 83580, note: "chưa bóc vỏ màu đen" },
-    { id: 35, name: "Vừng vàng Yến Để 25kg/bao", unit: "Kg", price: 49100, priceVAT: 51555, note: "chưa bóc vỏ màu vàng" },
-    { id: 36, name: "Vừng Trắng bao trắng 25kg/bao", unit: "Kg", price: 44400, priceVAT: 46620, note: "vừng đã bóc vỏ" },
-
-    // --- NHÓM LẠC ---
-    { id: 39, name: "HH Lạc T ĐỎ BAO TRANH ẢNH xanh", unit: "Kg", price: 46100, priceVAT: 47000, note: "Lạc nhân dùng chế biến" },
-    { id: 40, name: "Lạc T Trắng 6 LY ( 25kg/bao)", unit: "Kg", price: 40300, priceVAT: 40800, note: "" },
-    { id: 41, name: "Lạc T Trắng 8 LY BV ( 25kg/bao)", unit: "Kg", price: 44300, priceVAT: 45200, note: "" },
-    { id: 42, name: "Lạc Ấn TJ Bao Trắng 50kg/bao", unit: "Kg", price: 38300, priceVAT: 40215, note: "" },
-
-    // --- NHÓM NẤM & MỘC NHĨ ---
-    { id: 43, name: "Chân Nấm 1.8-2.3 (13 kg/Thùng)", unit: "Kg", price: 100800, priceVAT: 105840, note: "Chân nấm khô dùng nấu canh" },
-    { id: 44, name: "Chân Nấm Linh hải trên 2cm ( 15kg/thùng)", unit: "Kg", price: 119000, priceVAT: 124950, note: "" },
-    { id: 45, name: "Nấm 2.5-3 Linh Hải A (12kg/thùng)", unit: "Kg", price: 186700, priceVAT: 196035, note: "Các loại kích cỡ sz nấm/ cm" },
-    { id: 46, name: "Nấm hương AB (2.5- 3cm) 13kg/thùng", unit: "Kg", price: 184800, priceVAT: 194040, note: "" },
-    { id: 47, name: "Nấm 2.5-3 Linh Hải B (13kg/thùng)", unit: "Kg", price: 173200, priceVAT: 181860, note: "" },
-    { id: 48, name: "Nấm 2-2.5 Linh Hải A (14kg/thùng)", unit: "Kg", price: 186200, priceVAT: 195510, note: "" },
-    { id: 49, name: "Nấm hương AB (2-2.5cm) 15kg/thùng", unit: "Kg", price: 182400, priceVAT: 191520, note: "" },
-    { id: 50, name: "Nấm 2-2.5 Linh Hải B (14kg/thùng)", unit: "Kg", price: 172700, priceVAT: 181335, note: "" },
-    { id: 52, name: "Nhĩ T Sót chân 15kg/Bao Trắng mới", unit: "Kg", price: 94000, priceVAT: 98700, note: "mộc nhĩ TQ còn sót chân, cánh to, dày" },
-    { id: 53, name: "Nhĩ Ta Đặc Biệt (10kg/Bao)", unit: "Kg", price: 111000, priceVAT: 116550, note: "mộc nhĩ VN còn chân, cánh nhỏ, dày loại 1" },
-
-    // --- NHÓM BỘT ---
-    { id: 54, name: "Bột Chiên GIòn THÀNH PHÁT 1kg", unit: "Thùng", price: 193400, priceVAT: 208872, note: "Các loại bột thương hiệu Thành Phát Food" },
-    { id: 55, name: "Bột Béo 1kg", unit: "Thùng", price: 220400, priceVAT: 238032, note: "" },
-    { id: 56, name: "Bột Cốt Dừa To", unit: "Thùng", price: 198800, priceVAT: 214704, note: "" },
-    { id: 57, name: "Bột Mỳ 1kg", unit: "Thùng", price: 177200, priceVAT: 191376, note: "" },
-    { id: 58, name: "Bột Mỳ 500gr", unit: "Thùng", price: 177200, priceVAT: 191376, note: "" },
-    { id: 59, name: "Bột Năng THÀNH PHÁT 1kg", unit: "Thùng", price: 188000, priceVAT: 203040, note: "" },
-    { id: 60, name: "Bột Năng THÀNH PHÁT Loại 400G/gói", unit: "Thùng", price: 182600, priceVAT: 197208, note: "" },
-    { id: 61, name: "Bột Chiên Xù Vàng 1kg.", unit: "Thùng", price: 198800, priceVAT: 214704, note: "" },
-    { id: 62, name: "Bột Chiên Xù Màu 100g", unit: "Thùng", price: 123200, priceVAT: 133056, note: "" },
-    { id: 63, name: "Bột Chiên Xù Màu 1kg.", unit: "Thùng", price: 198800, priceVAT: 214704, note: "" },
-    { id: 64, name: "Bột Bắp 1kg", unit: "Thùng", price: 209600, priceVAT: 226368, note: "" },
-    { id: 65, name: "Bột Sắn Con Rồng 50kg/bao", unit: "Kg", price: 15800, priceVAT: 16590, note: "Bột làm trân châu" },
-
-    // --- NHÓM ĐƯỜNG ---
-    { id: 67, name: "Đường Phèn L Sơn bao 10kg", unit: "Kg", price: 23500, priceVAT: 25380, note: "Đường phèn dùng nấu chè" },
-    { id: 68, name: "Đường nâu-đen thượng hạng thùng 15kg", unit: "Kg", price: 17000, priceVAT: 18360, note: "" },
-    { id: 69, name: "Đường Phèn Tinh khiết LS Túi 500gr Thùng 20kg", unit: "Kg", price: 24100, priceVAT: 26028, note: "" },
-    { id: 70, name: "Đường viên khuôn thốt nốt 10kg/thùng", unit: "Kg", price: 19500, priceVAT: 21060, note: "" },
-    { id: 74, name: "TO La hán quả 200 quả/ thùng", unit: "Thùng", price: 531000, priceVAT: 557550, note: "" },
-
-    // --- MẶT HÀNG KHÁC (NÔNG SẢN, HẠT, TÁO ĐỎ...) ---
-    { id: 76, name: "Cốm Xanh 50kg/bao", unit: "Kg", price: 28800, priceVAT: 30240, note: "" },
-    { id: 77, name: "Yến mạch Chile 25kg/bao", unit: "Kg", price: 25900, priceVAT: 27972, note: "" },
-    { id: 78, name: "Sen Nõn 60kg/bao", unit: "Kg", price: 181300, priceVAT: 190365, note: "" },
-    { id: 79, name: "Sen Nam Cắt Đầu Thông Tay 60kg/bao", unit: "Kg", price: 158000, priceVAT: 158000, note: "" },
-    { id: 80, name: "TP Sen Nam Thông Máy 60kg/bao", unit: "Kg", price: 131000, priceVAT: 131000, note: "" },
-    { id: 81, name: "Sen Bắc 60kg/bao", unit: "Kg", price: 215500, priceVAT: 226275, note: "" },
-    { id: 82, name: "Hạt Tiêu Hạt Quảng Trị 50kg/bao", unit: "Kg", price: 170700, priceVAT: 170700, note: "" },
-    { id: 83, name: "Quế Thanh", unit: "Kg", price: 0, priceVAT: 0, note: "Liên hệ để nhận giá" },
-    { id: 84, name: "Cam Thảo", unit: "Kg", price: 0, priceVAT: 0, note: "Liên hệ để nhận giá" },
-    { id: 85, name: "Miến rong", unit: "Kg", price: 33200, priceVAT: 34860, note: "" },
-    { id: 86, name: "Hạt điều vỡ đôi 20kg/thùng", unit: "Kg", price: 195000, priceVAT: 204750, note: "" },
-    { id: 87, name: "Hạt dẻ cười 10kg/thùng", unit: "Kg", price: 0, priceVAT: 0, note: "Liên hệ để nhận giá" },
-    { id: 88, name: "Hạt điều màu Loại 2", unit: "Kg", price: 123900, priceVAT: 130095, note: "" },
-    { id: 89, name: "Hạt điều Màu NK 50kg/bao", unit: "Kg", price: 131000, priceVAT: 137550, note: "" },
-    { id: 90, name: "Táo Đỏ 15-17Q/100gr", unit: "Thùng", price: 485000, priceVAT: 509250, note: "" },
-    { id: 91, name: "Táo Đỏ 15-17Q/100gr (TH THÙNG TRẮNG )", unit: "Thùng", price: 508000, priceVAT: 533400, note: "" },
-    { id: 92, name: "Táo Đỏ 12-14Q/100gr", unit: "Thùng", price: 530000, priceVAT: 556500, note: "" },
-    { id: 93, name: "Táo Đỏ 32-35q/100gr", unit: "Thùng", price: 332000, priceVAT: 348600, note: "" },
-    { id: 94, name: "Táo Đỏ ĐẸP 19-22Q/100gr THÙNG", unit: "Thùng", price: 447500, priceVAT: 469875, note: "" },
-    { id: 95, name: "Táo Lát Số 1 ĐẸP dính đỏ (10kg/thùng)", unit: "Thùng", price: 397000, priceVAT: 416850, note: "" },
-    { id: 96, name: "Táo đỏ lát loại 1 ( Trung hậu )", unit: "Thùng", price: 410000, priceVAT: 430500, note: "" },
-    { id: 97, name: "Táo đen 40", unit: "Thùng", price: 405000, priceVAT: 425250, note: "" },
-    { id: 98, name: "Kỳ tử 5A (20kg/thùng)", unit: "Kg", price: 221000, priceVAT: 232050, note: "" },
-    { id: 99, name: "Đậu Lăng", unit: "Kg", price: 35700, priceVAT: 37485, note: "" },
-    { id: 100, name: "Đậu Gà 8mm", unit: "Kg", price: 32700, priceVAT: 34335, note: "" },
-    { id: 101, name: "Nhân hạt bí xanh", unit: "Kg", price: 94600, priceVAT: 99330, note: "" },
-    { id: 102, name: "Hạt kê", unit: "Kg", price: 25800, priceVAT: 27090, note: "" },
-    { id: 103, name: "Hạt giá đen (25kg/bao )", unit: "Kg", price: 31000, priceVAT: 32550, note: "" }
+       const products = [
+    // Nhóm Gạo
+    { id: 1, name: "Gạo Nếp Nhung Quyết Huệ 50kg/bao", unit: "Kg", price: 25800, note: "Nếp dẻo dùng nấu xôi, chè, bánh" },
+    { id: 2, name: "Gạo Nếp Hoa Vàng Quyết Huệ 50kg/bao", unit: "Kg", price: 25600, note: "Nếp thơm hạt tròn, dùng đồ xôi" },
+    { id: 3, name: "Gạo Nếp Gia Lai 60kg/bao", unit: "Kg", price: 18900, note: "Nếp dẻo dùng nấu xôi, chè, bánh" },
+    { id: 4, name: "Gạo Nếp Đồi Quyết Huệ 50kg/bao", unit: "Kg", price: 26300, note: "Nếp dẻo truyền thống" },
+    { id: 5, name: "Gạo Lứt Đen 50kg/bao", unit: "Kg", price: 16800, note: "Gạo lứt nguyên cám, dùng nấu cơm dinh dưỡng" },
+    { id: 6, name: "Gạo Lứt Đen ( chữ M ) 50kg/bao", unit: "Kg", price: 17800, note: "Gạo lứt đen loại chọn" },
+    { id: 7, name: "Gạo Lứt Huyết Rồng", unit: "Kg", price: 14200, note: "Gạo lứt đỏ giàu dinh dưỡng" },
+    { id: 8, name: "Gạo Nếp Cẩm Sịn 50kg/bao", unit: "Kg", price: 24300, note: "Nếp cẩm dùng nấu chè, xôi" },
+    
+    // Nhóm Ngô
+    { id: 10, name: "Ngô nếp dẹt đẹp 60kg/bao", unit: "Kg", price: 31600, note: "Ngô dẹt dùng nấu chè, cháo" },
+    { id: 11, name: "Ngô Hạt Đồng Giao hộp giấy", unit: "Thùng", price: 244400, note: "Ngô ngọt đóng hộp dùng chế biến món khai vị" },
+    { id: 12, name: "Ngô nghiền đồng giao ( 24 Hộp/ Thùng )", unit: "Thùng", price: 214400, note: "Ngô xay nhỏ dùng nấu cháo, súp" },
+    { id: 13, name: "Ngô Hạt Asean Thanh An 24lon/ T", unit: "Thùng", price: 253400, note: "Ngô ngọt đóng hộp" },
+    { id: 14, name: "Ngô Bỏng KING-POP 22.68kg/bao", unit: "Bao", price: 629900, note: "Hạt bắp làm bỏng ngô" },
+    { id: 15, name: "Ngô Bỏng KING-POP Nấm 22.68kg/bao", unit: "Bao", price: 734800, note: "Hạt bắp nổ dạng nấm" },
+    
+    // Nhóm Đậu / Đỗ
+    { id: 16, name: "Đậu xanh nguyên hạt", unit: "Kg", price: 36500, note: "Đậu xanh dùng nấu chè, cháo" },
+    { id: 17, name: "HH Đỗ Hà Lan Xanh 25kg/bao", unit: "Kg", price: 18200, note: "Đậu Hà Lan khô" },
+    { id: 18, name: "Đỏ nhỏ bao tranh ảnh", unit: "Kg", price: 37900, note: "Đậu đỏ nấu chè" },
+    { id: 19, name: "Đỏ to Sơn La 25kg/bao", unit: "Kg", price: 30000, note: "" },
+    { id: 21, name: "HH Đen Xanh Lòng Nhỏ Vụ 10/2025 50kg", unit: "Kg", price: 45000, note: "Dùng nấu chè" },
+    { id: 22, name: "HH.Đậu Đen xanh lòng to Mới 50kg/bao", unit: "Kg", price: 37600, note: "" },
+    { id: 23, name: "Đậu đen trắng lòng sơn la", unit: "Kg", price: 34000, note: "" },
+    { id: 24, name: "Đỗ mộc 999 bao bóng tím 25kg/bao", unit: "Kg", price: 39700, note: "Đậu xanh đã bóc vỏ" },
+    { id: 25, name: "Đỗ xanh tách đôi- A2 25kg/bao", unit: "Kg", price: 34300, note: "Đậu xanh vỡ đôi còn vỏ" },
+    { id: 26, name: "Đỗ xanh tách đôi- A3 25kg/bao", unit: "Kg", price: 32800, note: "" },
+    { id: 28, name: "Đỗ mộc DOXACO bao đỏ", unit: "Kg", price: 41300, note: "Đậu xanh đã bóc vỏ" },
+    { id: 30, name: "Đỗ Mộc 999 Bao Trong Cam 25kg/bao", unit: "Kg", price: 35300, note: "" },
+    
+    // Nhóm Vừng
+    { id: 32, name: "Vừng Đen GÓI 25kg/bao", unit: "Kg", price: 100900, note: "" },
+    { id: 33, name: "Vừng Vàng GÓI 25kg/bao", unit: "Kg", price: 66400, note: "" },
+    { id: 34, name: "Vừng Đen ĐẸP Yến Để 25kg/bao", unit: "Kg", price: 79600, note: "Chưa bóc vỏ màu đen" },
+    { id: 35, name: "Vừng vàng Yến Để 25kg/bao", unit: "Kg", price: 49100, note: "Chưa bóc vỏ màu vàng" },
+    { id: 36, name: "Vừng Trắng bao trắng 25kg/bao", unit: "Kg", price: 44400, note: "Vừng đã bóc vỏ" },
+    
+    // Nhóm Lạc
+    { id: 39, name: "HH Lạc T ĐỎ BAO TRANH ẢNH xanh", unit: "Kg", price: 46100, note: "Lạc nhân dùng chế biến" },
+    { id: 40, name: "Lạc T Trắng 6 LY ( 25kg/bao)", unit: "Kg", price: 40300, note: "" },
+    { id: 41, name: "Lạc T Trắng 8 LY BV ( 25kg/bao)", unit: "Kg", price: 44300, note: "" },
+    { id: 42, name: "Lạc Ấn TJ Bao Trắng 50kg/bao", unit: "Kg", price: 38300, note: "" },
+    
+    // Nhóm Nấm & Mộc Nhĩ
+    { id: 43, name: "Chân Nấm 1.8-2.3 (13 kg/Thùng)", unit: "Kg", price: 100800, note: "Chân nấm khô dùng nấu canh" },
+    { id: 44, name: "Chân Nấm Linh hải trên 2cm ( 15kg/thùng)", unit: "Kg", price: 119000, note: "" },
+    { id: 45, name: "Nấm 2.5-3 Linh Hải A (12kg/thùng)", unit: "Kg", price: 186700, note: "Các loại kích cỡ sz nấm/ cm" },
+    { id: 46, name: "Nấm hương AB (2.5- 3cm) 13kg/thùng", unit: "Kg", price: 184800, note: "" },
+    { id: 47, name: "Nấm 2.5-3 Linh Hải B (13kg/thùng)", unit: "Kg", price: 173200, note: "" },
+    { id: 48, name: "Nấm 2-2.5 Linh Hải A (14kg/thùng)", unit: "Kg", price: 186200, note: "" },
+    { id: 49, name: "Nấm hương AB (2-2.5cm) 15kg/thùng", unit: "Kg", price: 182400, note: "" },
+    { id: 50, name: "Nấm 2-2.5 Linh Hải B (14kg/thùng)", unit: "Kg", price: 172700, note: "" },
+    { id: 52, name: "Nhĩ T Sót chân 15kg/Bao Trắng mới", unit: "Kg", price: 94000, note: "Mộc nhĩ TQ còn sót chân, cánh to, dày" },
+    { id: 53, name: "Nhĩ Ta Đặc Biệt (10kg/Bao)", unit: "Kg", price: 111000, note: "Mộc nhĩ VN còn chân, cánh nhỏ, dày loại 1" },
+    
+    // Nhóm Bột
+    { id: 54, name: "Bột Chiên GIòn THÀNH PHÁT 1kg", unit: "Thùng", price: 193400, note: "Các loại bột thương hiệu Thành Phát Food" },
+    { id: 55, name: "Bột Béo 1kg", unit: "Thùng", price: 220400, note: "" },
+    { id: 56, name: "Bột Cốt Dừa To", unit: "Thùng", price: 198800, note: "" },
+    { id: 57, name: "Bột Mỳ 1kg", unit: "Thùng", price: 177200, note: "" },
+    { id: 58, name: "Bột Mỳ 500gr", unit: "Thùng", price: 177200, note: "" },
+    { id: 59, name: "Bột Năng THÀNH PHÁT 1kg", unit: "Thùng", price: 188000, note: "" },
+    { id: 60, name: "Bột Năng THÀNH PHÁT Loại 400G/gói", unit: "Thùng", price: 182600, note: "" },
+    { id: 61, name: "Bột Chiên Xù Vàng 1kg.", unit: "Thùng", price: 198800, note: "" },
+    { id: 62, name: "Bột Chiên Xù Màu 100g", unit: "Thùng", price: 123200, note: "" },
+    { id: 63, name: "Bột Chiên Xù Màu 1kg.", unit: "Thùng", price: 198800, note: "" },
+    { id: 64, name: "Bột Bắp 1kg", unit: "Thùng", price: 209600, note: "" },
+    { id: 65, name: "Bột Sắn Con Rồng 50kg/bao", unit: "Kg", price: 15800, note: "Bột làm trân châu" },
+    
+    // Nhóm Đường & Nông sản khô khác
+    { id: 67, name: "Đường Phèn L Sơn bao 10kg", unit: "Kg", price: 23500, note: "Đường phèn dùng nấu chè" },
+    { id: 68, name: "Đường nâu-đen thượng hạng thùng 15kg", unit: "Kg", price: 17000, note: "" },
+    { id: 69, name: "Đường Phèn Tinh khiết LS Túi 500gr Thùng 20kg", unit: "Kg", price: 24100, note: "" },
+    { id: 70, name: "Đường viên khuôn thốt nốt 10kg/thùng", unit: "Kg", price: 19500, note: "" },
+    { id: 74, name: "TO La hán quả 200 quả/ thùng", unit: "Thùng", price: 531000, note: "" },
+    { id: 78, name: "Sen Đồng Tháp 50kg/bao", unit: "Kg", price: 131000, note: "" },
+    { id: 81, name: "Sen Bắc 60kg/bao", unit: "Kg", price: 215500, note: "" },
+    { id: 82, name: "Hạt Tiêu Hạt Quảng Trị 50kg/bao", unit: "Kg", price: 170700, note: "" },
+    { id: 85, name: "Miến rong", unit: "Kg", price: 33200, note: "" },
+    { id: 86, name: "Hạt điều vỡ đôi 20kg/thùng", unit: "Kg", price: 195000, note: "" },
+    { id: 88, name: "Hạt điều màu Loại 2", unit: "Kg", price: 123900, note: "" },
+    { id: 89, name: "Hạt điều Màu NK 50kg/bao", unit: "Kg", price: 131000, note: "" },
+    { id: 90, name: "Táo Đỏ 15-17Q/100gr", unit: "Thùng", price: 485000, note: "" },
+    { id: 91, name: "Táo Đỏ 15-17Q/100gr (TH THÙNG TRẮNG )", unit: "Thùng", price: 508000, note: "" },
+    { id: 92, name: "Táo Đỏ 12-14Q/100gr", unit: "Thùng", price: 530000, note: "" }
 ];
         // Format tiền tệ VNĐ
         const formatMoney = (amount) => {

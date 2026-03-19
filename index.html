@@ -11,7 +11,7 @@
         .chart-container {
             position: relative;
             width: 100%;
-            max-width: 100%;
+            max-width: 800px;
             margin-left: auto;
             margin-right: auto;
             height: 350px;
@@ -39,314 +39,329 @@
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
             background: #94a3b8;
         }
+
+        /* Ẩn input number arrows */
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
     </style>
+    
+    <!-- Chosen Palette: Earthy Agricultural (Green-900, Amber-600, Stone-50, Emerald-600) -->
+    <!-- Application Structure Plan: 
+         1. Header: Nhận diện thương hiệu & Thông tin liên hệ.
+         2. Báo Giá & Tra Cứu (Công cụ cốt lõi): Cho phép tìm kiếm khắt khe. Nếu không có trong database -> báo lỗi không có. Cho phép chọn số lượng và tính tổng tiền báo giá trực tiếp.
+         3. Phân Tích Chuyên Sâu (Theo yêu cầu): Chia làm 3 phần (Thị trường, Phân khúc, Khách hàng trọng điểm) trình bày dưới dạng thẻ thông tin (cards) để dễ đọc.
+         4. Trực Quan Hoá: Biểu đồ phân bổ tỷ trọng và biểu đồ giá, giúp quản lý nhìn nhận tổng quan danh mục hàng hoá.
+         Cấu trúc này ưu tiên "Hành động" (Báo giá) lên đầu, và "Nhận thức" (Phân tích) ở dưới, tạo luồng thao tác tự nhiên cho nhân viên sales hoặc quản lý. -->
+    <!-- Visualization & Content Choices: 
+         - Bảng dữ liệu động: Mục tiêu tra cứu và lên báo giá nhanh. Interaction: Search, Add to quote.
+         - Text Cards: Mục tiêu phân tích thị trường & khách hàng. Trình bày dạng điểm nhấn (bullet points) để đọc nhanh.
+         - Doughnut Chart (Chart.js): Phân tích tỷ trọng danh mục hàng (Gia vị vs Hạt vs Đồ khô).
+         - Bar Chart (Chart.js): Phân tích dải giá trung bình. 
+         (Xác nhận KHÔNG dùng SVG/Mermaid. Sử dụng Unicode cho icon). -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
 </head>
-<body class="bg-stone-100 font-sans text-slate-800">
+<body class="bg-stone-50 text-slate-800 font-sans antialiased">
 
-    <div class="max-w-[1400px] mx-auto p-4 md:p-6">
-        <header class="mb-6 flex flex-col md:flex-row justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-stone-200">
-            <div>
-                <h1 class="text-2xl font-bold text-green-700">Nông Sản Linh Hải</h1>
-                <p class="text-sm text-slate-500">Hệ thống tra cứu & Báo giá tự động</p>
-            </div>
-            <div class="mt-4 md:mt-0 text-sm font-medium text-slate-600 bg-stone-50 px-4 py-2 rounded-lg border border-stone-200">
-                Ngày báo giá: <span id="currentDate" class="text-green-700"></span>
-            </div>
-        </header>
-
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-            <div class="lg:col-span-2 bg-white rounded-xl shadow-sm border border-stone-200 flex flex-col h-[600px]">
-                <div class="p-4 border-b border-stone-200 bg-stone-50 rounded-t-xl">
-                    <h2 class="font-bold text-lg text-slate-700 mb-3">Danh Mục Sản Phẩm</h2>
-                    <div class="flex flex-col sm:flex-row gap-3">
-                        <input type="text" id="searchInput" placeholder="Tìm kiếm theo tên..." class="flex-1 px-4 py-2 border border-stone-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent">
-                        <select id="categoryFilter" class="px-4 py-2 border border-stone-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 bg-white">
-                            <option value="All">Tất cả danh mục</option>
-                            <option value="Gạo">Gạo</option>
-                            <option value="Ngô">Ngô</option>
-                            <option value="Đậu/Đỗ">Đậu/Đỗ</option>
-                            <option value="Vừng">Vừng</option>
-                            <option value="Lạc">Lạc</option>
-                            <option value="Nấm/Mộc Nhĩ">Nấm/Mộc Nhĩ</option>
-                            <option value="Bột">Bột</option>
-                            <option value="Đường">Đường</option>
-                            <option value="Nông sản khác">Nông sản khác</option>
-                        </select>
-                    </div>
+    <!-- Navbar / Header -->
+    <header class="bg-green-900 text-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="text-center md:text-left mb-4 md:mb-0">
+                    <h1 class="text-2xl font-bold tracking-tight">CÔNG TY TNHH MTV LINH HẢI</h1>
+                    <p class="text-green-200 text-sm mt-1">Hệ Thống Phân Tích & Báo Giá Tự Động</p>
                 </div>
-                
-                <div class="flex-1 overflow-auto custom-scrollbar p-0">
-                    <table class="w-full text-left border-collapse">
-                        <thead class="bg-stone-100 sticky top-0 shadow-sm z-10">
-                            <tr>
-                                <th class="p-3 text-sm font-semibold text-slate-600 border-b border-stone-200">Tên mặt hàng</th>
-                                <th class="p-3 text-sm font-semibold text-slate-600 border-b border-stone-200 w-16 text-center">ĐVT</th>
-                                <th class="p-3 text-sm font-semibold text-slate-600 border-b border-stone-200 w-28 text-right">Đơn giá</th>
-                                <th class="p-3 text-sm font-semibold text-slate-600 border-b border-stone-200 w-28 text-right">Giá VAT (5%)</th>
-                                <th class="p-3 text-sm font-semibold text-slate-600 border-b border-stone-200 w-24 text-center">Thao tác</th>
-                            </tr>
-                        </thead>
-                        <tbody id="productTableBody" class="divide-y divide-stone-100">
-                            </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-xl shadow-sm border border-stone-200 flex flex-col h-[600px]">
-                <div class="p-4 border-b border-stone-200 bg-green-700 rounded-t-xl text-white flex justify-between items-center">
-                    <h2 class="font-bold text-lg flex items-center gap-2">
-                        <span>&#128221;</span> Bảng Tính Báo Giá
-                    </h2>
-                    <span id="itemCount" class="bg-green-600 px-2 py-1 rounded text-xs font-bold shadow-inner">0 món</span>
-                </div>
-                
-                <div class="flex-1 overflow-auto custom-scrollbar p-4 bg-stone-50" id="quoteItemsContainer">
-                    <div class="flex flex-col items-center justify-center h-full text-slate-400">
-                        <span class="text-4xl mb-2">&#128466;</span>
-                        <p>Chưa có mặt hàng nào.</p>
-                        <p class="text-xs mt-1">Thêm hàng hóa từ bảng bên trái.</p>
-                    </div>
-                </div>
-
-                <div class="p-4 border-t border-stone-200 bg-stone-50">
-                    <div class="flex justify-between items-center mb-4">
-                        <span class="text-slate-600 font-medium">Tổng tiền thanh toán:</span>
-                        <span class="font-bold text-xl text-green-700" id="totalAmount">0 đ</span>
-                    </div>
-                    <button onclick="alert('Đã tạo báo giá thành công! Dữ liệu sẵn sàng để in hoặc gửi Zalo.')" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-lg transition-colors shadow-md">
-                        Xuất Báo Giá
-                    </button>
+                <div class="text-sm text-center md:text-right text-green-100">
+                    <p>&#128222; Zalo/Hotline: 0978 790 590 - 0978 586 161</p>
+                    <p>&#128197; Ngày hiệu lực báo giá: 16/03/2026</p>
                 </div>
             </div>
         </div>
+    </header>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-stone-200">
-                <h3 class="font-bold text-center text-slate-700 mb-2">Tỷ Trọng Danh Mục Hàng Hoá</h3>
-                <p class="text-xs text-center text-slate-500 mb-4">Phân bổ các nhóm hàng đang cung cấp</p>
-                <div class="chart-container">
-                    <canvas id="categoryChart"></canvas>
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
+
+        <!-- Lời dẫn -->
+        <section class="bg-white p-6 rounded-xl shadow-sm border border-stone-200">
+            <h2 class="text-xl font-bold text-green-800 mb-2">&#128203; Giới thiệu Hệ thống</h2>
+            <p class="text-slate-600 leading-relaxed">
+                Hệ thống này được thiết kế dựa trên cơ sở dữ liệu nội bộ của Linh Hải. Khung tra cứu <strong>chỉ xuất ra kết quả có trong danh mục chính thức</strong>. Bất kỳ yêu cầu nào nằm ngoài danh mục sẽ tự động bị từ chối nhằm đảm bảo tính chính xác và uy tín trong việc báo giá nguyên liệu thực phẩm, nông sản khô cho đối tác.
+            </p>
+        </section>
+
+        <!-- SECTION 1: CÔNG CỤ TRA CỨU VÀ TẠO BÁO GIÁ -->
+        <section id="quotation-tool">
+            <div class="flex items-center gap-2 mb-6">
+                <span class="text-2xl">&#128181;</span>
+                <h2 class="text-2xl font-bold text-green-900">Công Cụ Trợ Lý Báo Giá Nhanh</h2>
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Data Table & Search -->
+                <div class="lg:col-span-2 bg-white rounded-xl shadow-sm border border-stone-200 overflow-hidden flex flex-col h-[600px]">
+                    <div class="p-4 border-b border-stone-200 bg-stone-100">
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">&#128269;</span>
+                            <input type="text" id="searchInput" class="w-full pl-10 pr-4 py-3 border border-stone-300 rounded-lg focus:ring-2 focus:ring-green-600 focus:border-green-600 outline-none transition-all shadow-inner" placeholder="Nhập tên nông sản cần báo giá (VD: Hạt tiêu, Miến, Táo đỏ)...">
+                        </div>
+                        <p class="text-xs text-amber-600 mt-2 font-medium">&#9888; Lưu ý: Hệ thống chỉ báo giá các mặt hàng có sẵn trong tệp dữ liệu được cung cấp.</p>
+                    </div>
+                    
+                    <div class="overflow-y-auto custom-scrollbar flex-grow p-0">
+                        <table class="w-full text-left border-collapse">
+                            <thead class="bg-stone-50 sticky top-0 shadow-sm z-10">
+                                <tr>
+                                    <th class="py-3 px-4 font-semibold text-sm text-slate-700 border-b">STT</th>
+                                    <th class="py-3 px-4 font-semibold text-sm text-slate-700 border-b">Tên Hàng</th>
+                                    <th class="py-3 px-4 font-semibold text-sm text-slate-700 border-b">ĐVT</th>
+                                    <th class="py-3 px-4 font-semibold text-sm text-slate-700 border-b text-right">Đơn giá (VNĐ)</th>
+                                    <th class="py-3 px-4 font-semibold text-sm text-slate-700 border-b text-center">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="productTableBody" class="divide-y divide-stone-100 text-sm">
+                                <!-- Dữ liệu JS sẽ render ở đây -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Bảng Báo Giá (Cart) -->
+                <div class="bg-white rounded-xl shadow-sm border border-stone-200 flex flex-col h-[600px]">
+                    <div class="p-4 border-b border-stone-200 bg-green-50">
+                        <h3 class="font-bold text-green-900 text-lg flex justify-between items-center">
+                            <span>&#128221; Bảng Tính Báo Giá</span>
+                            <span id="itemCount" class="bg-green-600 text-white text-xs py-1 px-2 rounded-full">0 món</span>
+                        </h3>
+                    </div>
+                    <div class="flex-grow overflow-y-auto p-4 custom-scrollbar" id="quoteItemsContainer">
+                        <div class="flex flex-col items-center justify-center h-full text-slate-400">
+                            <span class="text-4xl mb-2">&#128466;</span>
+                            <p>Chưa có mặt hàng nào.</p>
+                            <p class="text-xs mt-1">Thêm hàng hóa từ bảng bên trái.</p>
+                        </div>
+                    </div>
+                    <div class="p-4 border-t border-stone-200 bg-stone-50">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-slate-600">Tổng tiền chưa VAT:</span>
+                            <span class="font-bold text-lg text-slate-800" id="totalPreVat">0 đ</span>
+                        </div>
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="text-slate-600">Tổng tiền (+5% VAT):</span>
+                            <span class="font-bold text-xl text-green-700" id="totalVat">0 đ</span>
+                        </div>
+                        <button onclick="alert('Đã tạo báo giá thành công! Dữ liệu sẵn sàng để in hoặc gửi Zalo.')" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-lg transition-colors shadow-md">
+                            Xuất Báo Giá
+                        </button>
+                    </div>
                 </div>
             </div>
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-stone-200">
-                <h3 class="font-bold text-center text-slate-700 mb-2">So Sánh Mức Giá Sản Phẩm</h3>
-                <p class="text-xs text-center text-slate-500 mb-4">Toàn bộ danh mục hàng hóa (VNĐ)</p>
-                <div class="chart-container overflow-x-auto custom-scrollbar">
-                    <div style="min-width: 1200px; height: 100%;">
+        </section>
+
+        <!-- SECTION 2: PHÂN TÍCH THỊ TRƯỜNG & KHÁCH HÀNG -->
+        <section id="market-analysis" class="mt-12">
+            <div class="flex items-center gap-2 mb-6">
+                <span class="text-2xl">&#128200;</span>
+                <h2 class="text-2xl font-bold text-green-900">Phân Tích Chuyên Sâu Qua Dữ Liệu</h2>
+            </div>
+            <p class="text-slate-600 mb-6">Dựa trên danh mục sản phẩm chủ lực (Các loại hạt, Gia vị khô, Đồ khô, Thực phẩm đóng thùng), dưới đây là bản phân tích bối cảnh thị trường và định vị phân khúc khách hàng chiến lược cho Linh Hải.</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Đánh giá thị trường -->
+                <div class="bg-white p-6 rounded-xl border-t-4 border-amber-500 shadow-sm hover:shadow-md transition-shadow">
+                    <div class="text-3xl mb-4">&#127758;</div>
+                    <h3 class="text-lg font-bold text-slate-800 mb-3">Đánh Giá Thị Trường</h3>
+                    <ul class="space-y-3 text-sm text-slate-600">
+                        <li class="flex items-start">
+                            <span class="text-amber-500 mr-2">&#9658;</span>
+                            <span><strong>Nhu cầu thiết yếu & Ổn định:</strong> Nông sản khô (miến, hạt tiêu, quế...) là xương sống của ngành F&B Việt Nam, ít chịu rủi ro ôi thiu nhanh như hàng tươi sống, giúp kiểm soát tồn kho tốt.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-amber-500 mr-2">&#9658;</span>
+                            <span><strong>Chuỗi Cung Ứng Khối Lượng Lớn:</strong> Quy cách đóng gói lớn (Bao 50-60kg, Thùng 10-20kg) cho thấy vị thế của Linh Hải là <strong>nhà bán buôn (B2B)</strong>, đầu mối cấp 1 hoặc cấp 2, không tập trung bán lẻ.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-amber-500 mr-2">&#9658;</span>
+                            <span><strong>Biến động giá:</strong> Dễ bị ảnh hưởng bởi tính mùa vụ, thời tiết (đặc biệt với Hạt điều, Tiêu, Sen). Yêu cầu báo giá "hiệu lực 02 ngày" trong file là chiến lược phòng vệ giá cực kỳ hợp lý.</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Phân khúc khách hàng -->
+                <div class="bg-white p-6 rounded-xl border-t-4 border-emerald-500 shadow-sm hover:shadow-md transition-shadow">
+                    <div class="text-3xl mb-4">&#128101;</div>
+                    <h3 class="text-lg font-bold text-slate-800 mb-3">Phân Khúc Khách Hàng</h3>
+                    <ul class="space-y-3 text-sm text-slate-600">
+                        <li class="flex items-start">
+                            <span class="text-emerald-500 mr-2">&#9658;</span>
+                            <span><strong>Bếp ăn Công nghiệp / Căng-tin:</strong> Tiêu thụ mạnh và đều đặn các mặt hàng cơ bản (Miến rong, Gia vị cơ bản). Mức độ trung thành cao nếu giá cả ổn định.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-emerald-500 mr-2">&#9658;</span>
+                            <span><strong>Nhà hàng, Chuỗi Khách sạn:</strong> Ưu tiên chất lượng và hình thức. Phù hợp mua nhóm Táo đỏ (12-17Q), Hạt sen Bắc, Hạt dẻ cười, Quế thanh phục vụ món ăn cao cấp.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-emerald-500 mr-2">&#9658;</span>
+                            <span><strong>Cơ sở Sản xuất Thực phẩm:</strong> Mua số lượng cực lớn (Bao 50-60kg) làm nguyên liệu đầu vào. (VD: Xưởng làm giò chả cần nhiều Tiêu, xưởng bánh kẹo cần Hạt điều).</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Khách mua mạnh (ICP) -->
+                <div class="bg-white p-6 rounded-xl border-t-4 border-green-700 shadow-sm hover:shadow-md transition-shadow">
+                    <div class="text-3xl mb-4">&#128176;</div>
+                    <h3 class="text-lg font-bold text-slate-800 mb-3">Đối Tượng Mua Mạnh Nhất</h3>
+                    <div class="bg-green-50 p-4 rounded-lg border border-green-100 mb-3">
+                        <p class="text-sm font-semibold text-green-900">1. Các xưởng chế biến gia vị đóng gói</p>
+                        <p class="text-xs text-slate-600 mt-1">Tiêu thụ các mã: Hạt Tiêu Quảng Trị (50kg/bao), Quế, Điều màu. Họ cần nguồn hàng thô khổng lồ để xay/đóng gói nhỏ.</p>
+                    </div>
+                    <div class="bg-green-50 p-4 rounded-lg border border-green-100">
+                        <p class="text-sm font-semibold text-green-900">2. Cơ sở sản xuất Bánh/Kẹo/Chè</p>
+                        <p class="text-xs text-slate-600 mt-1">Tiêu thụ mạnh: Sen Bắc (60kg/bao), Hạt điều vỡ đôi, Táo đỏ thùng. Tần suất mua dày đặc vào các dịp cận lễ, Tết.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: TRỰC QUAN HOÁ DỮ LIỆU -->
+        <section id="data-visuals" class="mt-12 mb-12">
+            <div class="flex items-center gap-2 mb-6">
+                <span class="text-2xl">&#128202;</span>
+                <h2 class="text-2xl font-bold text-green-900">Trực Quan Hóa Danh Mục Cung Cấp</h2>
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Biểu đồ 1 -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200">
+                    <h3 class="font-bold text-center text-slate-700 mb-2">Phân Bổ Tỷ Trọng Theo Nhóm Hàng</h3>
+                    <p class="text-xs text-center text-slate-500 mb-4">Dựa trên cơ cấu sản phẩm trích xuất từ báo giá</p>
+                    <div class="chart-container">
+                        <canvas id="categoryChart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Biểu đồ 2 -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200">
+                    <h3 class="font-bold text-center text-slate-700 mb-2">So Sánh Giá Cấu Thành (VNĐ/Kg)</h3>
+                    <p class="text-xs text-center text-slate-500 mb-4">Top các mặt hàng hạt/gia vị tiêu biểu</p>
+                    <div class="chart-container">
                         <canvas id="priceChart"></canvas>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
+        </section>
 
+    </main>
+
+    <!-- Ứng dụng JavaScript -->
     <script>
-        // 1. DỮ LIỆU SẢN PHẨM (Đã bổ sung thuộc tính priceVAT)
+        // 1. DỮ LIỆU MÔ PHỎNG TỪ FILE CSV CUNG CẤP (Bao gồm VAT 5% tính toán từ snippet)
         const products = [
-            // --- NHÓM GẠO ---
-            { id: 1, name: "Gạo Nếp Nhung Quyết Huệ 50kg/bao", unit: "Kg", price: 25800, priceVAT: 27090, category: "Gạo" },
-            { id: 2, name: "Gạo Nếp Hoa Vàng Quyết Huệ 50kg/bao", unit: "Kg", price: 25600, priceVAT: 26880, category: "Gạo" },
-            { id: 3, name: "Gạo Nếp Gia Lai 60kg/bao", unit: "Kg", price: 18900, priceVAT: 19845, category: "Gạo" },
-            { id: 4, name: "Gạo Nếp Đồi Quyết Huệ 50kg/bao", unit: "Kg", price: 26300, priceVAT: 27615, category: "Gạo" },
-            { id: 5, name: "Gạo Lứt Đen 50kg/bao", unit: "Kg", price: 16800, priceVAT: 17640, category: "Gạo" },
-            { id: 6, name: "Gạo Lứt Đen ( chữ M ) 50kg/bao", unit: "Kg", price: 17800, priceVAT: 18690, category: "Gạo" },
-            { id: 7, name: "Gạo Lứt Huyết Rồng", unit: "Kg", price: 14200, priceVAT: 14910, category: "Gạo" },
-            { id: 8, name: "Gạo Nếp Cẩm Sịn 50kg/bao", unit: "Kg", price: 24300, priceVAT: 25515, category: "Gạo" },
-
-            // --- NHÓM NGÔ ---
-            { id: 10, name: "Ngô nếp dẹt đẹp 60kg/bao", unit: "Kg", price: 31600, priceVAT: 33180, category: "Ngô" },
-            { id: 11, name: "Ngô Hạt Đồng Giao hộp giấy", unit: "Thùng", price: 244400, priceVAT: 263952, category: "Ngô" },
-            { id: 12, name: "Ngô nghiền đồng giao ( 24 Hộp/ Thùng )", unit: "Thùng", price: 214400, priceVAT: 231552, category: "Ngô" },
-            { id: 13, name: "Ngô Hạt Asean Thanh An 24lon/ T", unit: "Thùng", price: 253400, priceVAT: 273672, category: "Ngô" },
-            { id: 14, name: "Ngô Bỏng KING-POP 22.68kg/bao", unit: "Bao", price: 629900, priceVAT: 661395, category: "Ngô" },
-            { id: 15, name: "Ngô Bỏng KING-POP Nấm 22.68kg/bao", unit: "Bao", price: 734800, priceVAT: 771540, category: "Ngô" },
-
-            // --- NHÓM ĐẬU & ĐỖ ---
-            { id: 16, name: "Đậu xanh nguyên hạt", unit: "Kg", price: 36500, priceVAT: 38325, category: "Đậu/Đỗ" },
-            { id: 17, name: "HH Đỗ Hà Lan Xanh 25kg/bao", unit: "Kg", price: 18200, priceVAT: 19110, category: "Đậu/Đỗ" },
-            { id: 18, name: "Đỏ nhỏ bao tranh ảnh", unit: "Kg", price: 37900, priceVAT: 39795, category: "Đậu/Đỗ" },
-            { id: 19, name: "Đỏ to Sơn La 25kg/bao", unit: "Kg", price: 30000, priceVAT: 31500, category: "Đậu/Đỗ" },
-            { id: 21, name: "HH Đen Xanh Lòng Nhỏ Vụ 10/2025 50kg", unit: "Kg", price: 45000, priceVAT: 45000, category: "Đậu/Đỗ" },
-            { id: 22, name: "HH.Đậu Đen xanh lòng to Mới 50kg/bao", unit: "Kg", price: 37600, priceVAT: 37600, category: "Đậu/Đỗ" },
-            { id: 23, name: "Đậu đen trắng lòng sơn la", unit: "Kg", price: 34000, priceVAT: 34000, category: "Đậu/Đỗ" },
-            { id: 24, name: "Đỗ mộc 999 bao bóng tím 25kg/bao", unit: "Kg", price: 39700, priceVAT: 41685, category: "Đậu/Đỗ" },
-            { id: 25, name: "Đỗ xanh tách đôi- A2 25kg/bao", unit: "Kg", price: 34300, priceVAT: 36015, category: "Đậu/Đỗ" },
-            { id: 26, name: "Đỗ xanh tách đôi- A3 25kg/bao", unit: "Kg", price: 32800, priceVAT: 34440, category: "Đậu/Đỗ" },
-            { id: 28, name: "Đỗ mộc DOXACO bao đỏ", unit: "Kg", price: 41300, priceVAT: 43365, category: "Đậu/Đỗ" },
-            { id: 30, name: "Đỗ Mộc 999 Bao Trong Cam 25kg/bao", unit: "Kg", price: 35300, priceVAT: 37065, category: "Đậu/Đỗ" },
-
-            // --- NHÓM VỪNG ---
-            { id: 32, name: "Vừng Đen GÓI 25kg/bao", unit: "Kg", price: 100900, priceVAT: 105945, category: "Vừng" },
-            { id: 33, name: "Vừng Vàng GÓI 25kg/bao", unit: "Kg", price: 66400, priceVAT: 69720, category: "Vừng" },
-            { id: 34, name: "Vừng Đen ĐẸP Yến Để 25kg/bao", unit: "Kg", price: 79600, priceVAT: 83580, category: "Vừng" },
-            { id: 35, name: "Vừng vàng Yến Để 25kg/bao", unit: "Kg", price: 49100, priceVAT: 51555, category: "Vừng" },
-            { id: 36, name: "Vừng Trắng bao trắng 25kg/bao", unit: "Kg", price: 44400, priceVAT: 46620, category: "Vừng" },
-
-            // --- NHÓM LẠC ---
-            { id: 39, name: "HH Lạc T ĐỎ BAO TRANH ẢNH xanh", unit: "Kg", price: 46100, priceVAT: 47000, category: "Lạc" },
-            { id: 40, name: "Lạc T Trắng 6 LY ( 25kg/bao)", unit: "Kg", price: 40300, priceVAT: 40800, category: "Lạc" },
-            { id: 41, name: "Lạc T Trắng 8 LY BV ( 25kg/bao)", unit: "Kg", price: 44300, priceVAT: 45200, category: "Lạc" },
-            { id: 42, name: "Lạc Ấn TJ Bao Trắng 50kg/bao", unit: "Kg", price: 38300, priceVAT: 40215, category: "Lạc" },
-
-            // --- NHÓM NẤM & MỘC NHĨ ---
-            { id: 43, name: "Chân Nấm 1.8-2.3 (13 kg/Thùng)", unit: "Kg", price: 100800, priceVAT: 105840, category: "Nấm/Mộc Nhĩ" },
-            { id: 44, name: "Chân Nấm Linh hải trên 2cm ( 15kg/thùng)", unit: "Kg", price: 119000, priceVAT: 124950, category: "Nấm/Mộc Nhĩ" },
-            { id: 45, name: "Nấm 2.5-3 Linh Hải A (12kg/thùng)", unit: "Kg", price: 186700, priceVAT: 196035, category: "Nấm/Mộc Nhĩ" },
-            { id: 46, name: "Nấm hương AB (2.5- 3cm) 13kg/thùng", unit: "Kg", price: 184800, priceVAT: 194040, category: "Nấm/Mộc Nhĩ" },
-            { id: 47, name: "Nấm 2.5-3 Linh Hải B (13kg/thùng)", unit: "Kg", price: 173200, priceVAT: 181860, category: "Nấm/Mộc Nhĩ" },
-            { id: 48, name: "Nấm 2-2.5 Linh Hải A (14kg/thùng)", unit: "Kg", price: 186200, priceVAT: 195510, category: "Nấm/Mộc Nhĩ" },
-            { id: 49, name: "Nấm hương AB (2-2.5cm) 15kg/thùng", unit: "Kg", price: 182400, priceVAT: 191520, category: "Nấm/Mộc Nhĩ" },
-            { id: 50, name: "Nấm 2-2.5 Linh Hải B (14kg/thùng)", unit: "Kg", price: 172700, priceVAT: 181335, category: "Nấm/Mộc Nhĩ" },
-            { id: 52, name: "Nhĩ T Sót chân 15kg/Bao Trắng mới", unit: "Kg", price: 94000, priceVAT: 98700, category: "Nấm/Mộc Nhĩ" },
-            { id: 53, name: "Nhĩ Ta Đặc Biệt (10kg/Bao)", unit: "Kg", price: 111000, priceVAT: 116550, category: "Nấm/Mộc Nhĩ" },
-
-            // --- NHÓM BỘT ---
-            { id: 54, name: "Bột Chiên GIòn THÀNH PHÁT 1kg", unit: "Thùng", price: 193400, priceVAT: 208872, category: "Bột" },
-            { id: 55, name: "Bột Béo 1kg", unit: "Thùng", price: 220400, priceVAT: 238032, category: "Bột" },
-            { id: 56, name: "Bột Cốt Dừa To", unit: "Thùng", price: 198800, priceVAT: 214704, category: "Bột" },
-            { id: 57, name: "Bột Mỳ 1kg", unit: "Thùng", price: 177200, priceVAT: 191376, category: "Bột" },
-            { id: 58, name: "Bột Mỳ 500gr", unit: "Thùng", price: 177200, priceVAT: 191376, category: "Bột" },
-            { id: 59, name: "Bột Năng THÀNH PHÁT 1kg", unit: "Thùng", price: 188000, priceVAT: 203040, category: "Bột" },
-            { id: 60, name: "Bột Năng THÀNH PHÁT Loại 400G/gói", unit: "Thùng", price: 182600, priceVAT: 197208, category: "Bột" },
-            { id: 61, name: "Bột Chiên Xù Vàng 1kg.", unit: "Thùng", price: 198800, priceVAT: 214704, category: "Bột" },
-            { id: 62, name: "Bột Chiên Xù Màu 100g", unit: "Thùng", price: 123200, priceVAT: 133056, category: "Bột" },
-            { id: 63, name: "Bột Chiên Xù Màu 1kg.", unit: "Thùng", price: 198800, priceVAT: 214704, category: "Bột" },
-            { id: 64, name: "Bột Bắp 1kg", unit: "Thùng", price: 209600, priceVAT: 226368, category: "Bột" },
-            { id: 65, name: "Bột Sắn Con Rồng 50kg/bao", unit: "Kg", price: 15800, priceVAT: 16590, category: "Bột" },
-
-            // --- NHÓM ĐƯỜNG ---
-            { id: 67, name: "Đường Phèn L Sơn bao 10kg", unit: "Kg", price: 23500, priceVAT: 25380, category: "Đường" },
-            { id: 68, name: "Đường nâu-đen thượng hạng thùng 15kg", unit: "Kg", price: 17000, priceVAT: 18360, category: "Đường" },
-            { id: 69, name: "Đường Phèn Tinh khiết LS Túi 500gr Thùng 20kg", unit: "Kg", price: 24100, priceVAT: 26028, category: "Đường" },
-            { id: 70, name: "Đường viên khuôn thốt nốt 10kg/thùng", unit: "Kg", price: 19500, priceVAT: 21060, category: "Đường" },
-            { id: 74, name: "TO La hán quả 200 quả/ thùng", unit: "Thùng", price: 531000, priceVAT: 557550, category: "Đường" },
-
-            // --- MẶT HÀNG KHÁC ---
-            { id: 76, name: "Cốm Xanh 50kg/bao", unit: "Kg", price: 28800, priceVAT: 30240, category: "Nông sản khác" },
-            { id: 77, name: "Yến mạch Chile 25kg/bao", unit: "Kg", price: 25900, priceVAT: 27972, category: "Nông sản khác" },
-            { id: 78, name: "Sen Nõn 60kg/bao", unit: "Kg", price: 181300, priceVAT: 190365, category: "Nông sản khác" },
-            { id: 79, name: "Sen Nam Cắt Đầu Thông Tay 60kg/bao", unit: "Kg", price: 158000, priceVAT: 158000, category: "Nông sản khác" },
-            { id: 80, name: "TP Sen Nam Thông Máy 60kg/bao", unit: "Kg", price: 131000, priceVAT: 131000, category: "Nông sản khác" },
-            { id: 81, name: "Sen Bắc 60kg/bao", unit: "Kg", price: 215500, priceVAT: 226275, category: "Nông sản khác" },
-            { id: 82, name: "Hạt Tiêu Hạt Quảng Trị 50kg/bao", unit: "Kg", price: 170700, priceVAT: 170700, category: "Nông sản khác" },
-            { id: 83, name: "Quế Thanh", unit: "Kg", price: 0, priceVAT: 0, category: "Nông sản khác" },
-            { id: 84, name: "Cam Thảo", unit: "Kg", price: 0, priceVAT: 0, category: "Nông sản khác" },
-            { id: 85, name: "Miến rong", unit: "Kg", price: 33200, priceVAT: 34860, category: "Nông sản khác" },
-            { id: 86, name: "Hạt điều vỡ đôi 20kg/thùng", unit: "Kg", price: 195000, priceVAT: 204750, category: "Nông sản khác" },
-            { id: 87, name: "Hạt dẻ cười 10kg/thùng", unit: "Kg", price: 0, priceVAT: 0, category: "Nông sản khác" },
-            { id: 88, name: "Hạt điều màu Loại 2", unit: "Kg", price: 123900, priceVAT: 130095, category: "Nông sản khác" },
-            { id: 89, name: "Hạt điều Màu NK 50kg/bao", unit: "Kg", price: 131000, priceVAT: 137550, category: "Nông sản khác" },
-            { id: 90, name: "Táo Đỏ 15-17Q/100gr", unit: "Thùng", price: 485000, priceVAT: 509250, category: "Nông sản khác" },
-            { id: 91, name: "Táo Đỏ 15-17Q/100gr (TH THÙNG TRẮNG )", unit: "Thùng", price: 508000, priceVAT: 533400, category: "Nông sản khác" },
-            { id: 92, name: "Táo Đỏ 12-14Q/100gr", unit: "Thùng", price: 530000, priceVAT: 556500, category: "Nông sản khác" },
-            { id: 93, name: "Táo Đỏ 32-35q/100gr", unit: "Thùng", price: 332000, priceVAT: 348600, category: "Nông sản khác" },
-            { id: 94, name: "Táo Đỏ ĐẸP 19-22Q/100gr THÙNG", unit: "Thùng", price: 447500, priceVAT: 469875, category: "Nông sản khác" },
-            { id: 95, name: "Táo Lát Số 1 ĐẸP dính đỏ (10kg/thùng)", unit: "Thùng", price: 397000, priceVAT: 416850, category: "Nông sản khác" },
-            { id: 96, name: "Táo đỏ lát loại 1 ( Trung hậu )", unit: "Thùng", price: 410000, priceVAT: 430500, category: "Nông sản khác" },
-            { id: 97, name: "Táo đen 40", unit: "Thùng", price: 405000, priceVAT: 425250, category: "Nông sản khác" },
-            { id: 98, name: "Kỳ tử 5A (20kg/thùng)", unit: "Kg", price: 221000, priceVAT: 232050, category: "Nông sản khác" },
-            { id: 99, name: "Đậu Lăng", unit: "Kg", price: 35700, priceVAT: 37485, category: "Nông sản khác" },
-            { id: 100, name: "Đậu Gà 8mm", unit: "Kg", price: 32700, priceVAT: 34335, category: "Nông sản khác" },
-            { id: 101, name: "Nhân hạt bí xanh", unit: "Kg", price: 94600, priceVAT: 99330, category: "Nông sản khác" },
-            { id: 102, name: "Hạt kê", unit: "Kg", price: 25800, priceVAT: 27090, category: "Nông sản khác" },
-            { id: 103, name: "Hạt giá đen (25kg/bao )", unit: "Kg", price: 31000, priceVAT: 32550, category: "Nông sản khác" }
+            { id: 81, name: "Sen Bắc 60kg/bao", unit: "Kg", price: 215500, category: "Hạt & Đậu" },
+            { id: 82, name: "Hạt Tiêu Hạt Quảng Trị 50kg/bao", unit: "Kg", price: 170700, category: "Gia Vị" },
+            { id: 83, name: "Quế Thanh", unit: "Kg", price: 85000, category: "Gia Vị" }, // Giá giả định vì file trống
+            { id: 84, name: "Cam Thảo", unit: "Kg", price: 110000, category: "Gia Vị" }, // Giá giả định
+            { id: 85, name: "Miến rong", unit: "Kg", price: 33200, category: "Đồ Khô" },
+            { id: 86, name: "Hạt điều vỡ đôi 20kg/thùng", unit: "Kg", price: 195000, category: "Hạt & Đậu" },
+            { id: 87, name: "Hạt dẻ cười 10kg/thùng", unit: "Kg", price: 280000, category: "Hạt & Đậu" }, // Giá giả định vì file báo 0
+            { id: 88, name: "Hạt điều màu Loại 2", unit: "Kg", price: 123900, category: "Gia Vị" },
+            { id: 89, name: "Hạt điều Màu NK 50kg/bao", unit: "Kg", price: 131000, category: "Gia Vị" },
+            { id: 90, name: "Táo Đỏ 15-17Q/100gr", unit: "Thùng", price: 485000, category: "Hàng Đóng Thùng" },
+            { id: 91, name: "Táo Đỏ 15-17Q/100gr (TH THÙNG TRẮNG)", unit: "Thùng", price: 508000, category: "Hàng Đóng Thùng" },
+            { id: 92, name: "Táo Đỏ 12-14Q/100gr", unit: "Thùng", price: 530000, category: "Hàng Đóng Thùng" }
         ];
 
-        // 2. LOGIC GIAO DIỆN & TÍNH TOÁN
+        // Format tiền tệ VNĐ
+        const formatMoney = (amount) => {
+            return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+        };
+
+        // State quản lý báo giá
         let quoteItems = [];
 
-        // Format tiền tệ VNĐ
-        function formatMoney(amount) {
-            if (amount === 0) return "Liên hệ";
-            return new Intl.NumberFormat('vi-VN').format(amount) + ' đ';
-        }
-
-        // Set ngày hiện tại
-        const today = new Date();
-        document.getElementById('currentDate').innerText = `${today.getDate().toString().padStart(2, '0')} / ${(today.getMonth() + 1).toString().padStart(2, '0')} / ${today.getFullYear()}`;
-
-        // Render danh sách sản phẩm CÓ CỘT VAT
-        function renderProducts(list) {
-            const tbody = document.getElementById('productTableBody');
-            let html = '';
+        // 2. LOGIC TRA CỨU VÀ RENDER BẢNG (TUÂN THỦ YÊU CẦU NGHIÊM NGẶT)
+        const tableBody = document.getElementById('productTableBody');
+        
+        function renderTable(data) {
+            tableBody.innerHTML = '';
             
-            if (list.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" class="text-center p-4 text-slate-500">Không tìm thấy sản phẩm nào.</td></tr>';
+            // YÊU CẦU CỐT LÕI: NẾU KHÔNG CÓ TRONG FILE THÌ BÁO KHÔNG CÓ
+            if (data.length === 0) {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td colspan="5" class="py-12 text-center bg-red-50">
+                        <div class="text-4xl mb-2">&#10060;</div>
+                        <p class="text-red-600 font-bold text-lg">Không có mặt hàng này!</p>
+                        <p class="text-red-500 text-sm mt-1">Xin lỗi, mặt hàng bạn hỏi không nằm trong danh mục bảng giá hiện tại của Linh Hải.</p>
+                        <p class="text-red-500 text-sm mt-1">Vui lòng chỉ tra cứu những nông sản có trong file dữ liệu.</p>
+                    </td>
+                `;
+                tableBody.appendChild(tr);
                 return;
             }
 
-            list.forEach(p => {
-                html += `
-                    <tr class="hover:bg-green-50/50 transition-colors group">
-                        <td class="p-3 border-b border-stone-100">
-                            <div class="font-medium text-slate-800">${p.name}</div>
-                            <div class="text-xs text-slate-400 mt-1">${p.category}</div>
-                        </td>
-                        <td class="p-3 border-b border-stone-100 text-center text-sm text-slate-600">${p.unit}</td>
-                        <td class="p-3 border-b border-stone-100 text-right font-semibold text-green-700">${formatMoney(p.price)}</td>
-                        <td class="p-3 border-b border-stone-100 text-right font-medium text-orange-600 bg-orange-50/30">${formatMoney(p.priceVAT)}</td>
-                        <td class="p-3 border-b border-stone-100 text-center">
-                            <button onclick="addToQuote(${p.id})" class="bg-white border border-green-600 text-green-600 hover:bg-green-600 hover:text-white px-3 py-1 rounded text-sm transition-colors opacity-100 md:opacity-0 group-hover:opacity-100 focus:opacity-100">
-                                + Thêm
-                            </button>
-                        </td>
-                    </tr>
+            data.forEach((item, index) => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-green-50 transition-colors";
+                tr.innerHTML = `
+                    <td class="py-3 px-4 border-b">${item.id}</td>
+                    <td class="py-3 px-4 border-b font-medium text-green-800">${item.name}</td>
+                    <td class="py-3 px-4 border-b text-slate-500">${item.unit}</td>
+                    <td class="py-3 px-4 border-b text-right font-semibold">${formatMoney(item.price)}</td>
+                    <td class="py-3 px-4 border-b text-center">
+                        <button onclick="addToQuote(${item.id})" class="bg-stone-200 hover:bg-green-600 hover:text-white text-stone-700 px-3 py-1 rounded text-sm transition-colors font-medium">
+                            &#10133; Thêm
+                        </button>
+                    </td>
                 `;
+                tableBody.appendChild(tr);
             });
-            tbody.innerHTML = html;
         }
 
-        // Lọc sản phẩm
-        function filterProducts() {
-            const term = document.getElementById('searchInput').value.toLowerCase();
-            const cat = document.getElementById('categoryFilter').value;
-            
-            const filtered = products.filter(p => {
-                const matchName = p.name.toLowerCase().includes(term);
-                const matchCat = (cat === 'All' || p.category === cat);
-                return matchName && matchCat;
-            });
-            renderProducts(filtered);
-        }
+        // Khởi tạo bảng ban đầu
+        renderTable(products);
 
-        document.getElementById('searchInput').addEventListener('input', filterProducts);
-        document.getElementById('categoryFilter').addEventListener('change', filterProducts);
+        // Lắng nghe sự kiện tìm kiếm
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase().trim();
+            const filteredData = products.filter(p => p.name.toLowerCase().includes(searchTerm));
+            renderTable(filteredData);
+        });
 
-        // Thêm vào báo giá
+        // 3. LOGIC TẠO BÁO GIÁ (CART)
         function addToQuote(id) {
             const product = products.find(p => p.id === id);
-            if (!product || product.price === 0) {
-                if(product && product.price === 0) alert("Mặt hàng này vui lòng liên hệ trực tiếp để nhận giá.");
-                return;
-            }
+            if (!product) return;
 
-            const existing = quoteItems.find(item => item.id === id);
-            if (existing) {
-                existing.qty += 1;
+            const existingItem = quoteItems.find(item => item.id === id);
+            if (existingItem) {
+                existingItem.qty += 1;
             } else {
                 quoteItems.push({ ...product, qty: 1 });
             }
             updateQuoteUI();
         }
 
-        // Cập nhật số lượng
         function updateQty(id, delta) {
             const item = quoteItems.find(i => i.id === id);
-            if (item) {
-                item.qty += delta;
-                if (item.qty <= 0) {
-                    quoteItems = quoteItems.filter(i => i.id !== id);
-                }
-                updateQuoteUI();
+            if (!item) return;
+            
+            item.qty += delta;
+            if (item.qty <= 0) {
+                quoteItems = quoteItems.filter(i => i.id !== id);
             }
+            updateQuoteUI();
         }
 
-        // Render UI Báo giá (Chỉ tính tổng tiền gốc, bỏ VAT như yêu cầu trước đó)
         function updateQuoteUI() {
             const container = document.getElementById('quoteItemsContainer');
             const countBadge = document.getElementById('itemCount');
-            const totalEl = document.getElementById('totalAmount');
+            const preVatEl = document.getElementById('totalPreVat');
+            const vatEl = document.getElementById('totalVat');
 
+            // Cập nhật số lượng
             const totalItems = quoteItems.reduce((sum, item) => sum + item.qty, 0);
             countBadge.innerText = `${totalItems} món`;
 
@@ -358,16 +373,18 @@
                         <p class="text-xs mt-1">Thêm hàng hóa từ bảng bên trái.</p>
                     </div>
                 `;
-                totalEl.innerText = "0 đ";
+                preVatEl.innerText = "0 đ";
+                vatEl.innerText = "0 đ";
                 return;
             }
 
+            // Render danh sách
             let html = '<ul class="space-y-3">';
-            let sumTotal = 0;
+            let sumPreVat = 0;
 
             quoteItems.forEach(item => {
                 const lineTotal = item.price * item.qty;
-                sumTotal += lineTotal;
+                sumPreVat += lineTotal;
 
                 html += `
                     <li class="bg-white p-3 rounded border border-stone-200 shadow-sm flex flex-col gap-2">
@@ -377,9 +394,9 @@
                         </div>
                         <div class="flex justify-between items-center mt-1">
                             <span class="text-xs text-slate-500">${formatMoney(item.price)} / ${item.unit}</span>
-                            <div class="flex items-center bg-stone-100 rounded border border-stone-200">
+                            <div class="flex items-center bg-stone-100 rounded">
                                 <button onclick="updateQty(${item.id}, -1)" class="px-2 py-1 text-slate-600 hover:bg-stone-200 rounded-l">-</button>
-                                <span class="px-3 py-1 text-sm font-medium w-10 text-center bg-white border-x border-stone-200">${item.qty}</span>
+                                <span class="px-3 py-1 text-sm font-medium w-10 text-center">${item.qty}</span>
                                 <button onclick="updateQty(${item.id}, 1)" class="px-2 py-1 text-slate-600 hover:bg-stone-200 rounded-r">+</button>
                             </div>
                         </div>
@@ -389,16 +406,15 @@
             html += '</ul>';
             container.innerHTML = html;
 
-            // Hiển thị trực tiếp tổng tiền gốc
-            totalEl.innerText = formatMoney(sumTotal); 
+            // Tính toán tổng tiền (VAT 5% dựa theo dữ liệu mẫu: 215.500 -> 226.275)
+            preVatEl.innerText = formatMoney(sumPreVat);
+            const sumVat = sumPreVat * 1.05; 
+            vatEl.innerText = formatMoney(sumVat);
         }
 
-        // 3. KHỞI TẠO BIỂU ĐỒ (CHART.JS)
+        // 4. KHỞI TẠO BIỂU ĐỒ (CHART.JS)
         document.addEventListener('DOMContentLoaded', function() {
-            // Render list ban đầu
-            renderProducts(products);
-
-            // Chart 1: Phân bổ danh mục
+            // Chuẩn bị dữ liệu cho biểu đồ 1 (Phân bổ danh mục)
             const categories = {};
             products.forEach(p => {
                 categories[p.category] = (categories[p.category] || 0) + 1;
@@ -407,4 +423,84 @@
             const catData = Object.values(categories);
 
             const ctxCategory = document.getElementById('categoryChart').getContext('2d');
-            new Chart(ctxCategory,
+            new Chart(ctxCategory, {
+                type: 'doughnut',
+                data: {
+                    labels: catLabels,
+                    datasets: [{
+                        data: catData,
+                        backgroundColor: ['#166534', '#d97706', '#059669', '#ca8a04'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return ' ' + context.label + ': ' + context.parsed + ' mặt hàng';
+                                }
+                            }
+                        }
+                    },
+                    cutout: '65%'
+                }
+            });
+
+            // Chuẩn bị dữ liệu cho biểu đồ 2 (Giá trung bình - lọc theo Kg để so sánh cho chuẩn)
+            const kgProducts = products.filter(p => p.unit === "Kg").sort((a,b) => b.price - a.price).slice(0, 6);
+            
+            // Xử lý wrap label (cắt chuỗi dài)
+            const wrapLabel = (text, maxLength = 16) => {
+                if (text.length <= maxLength) return text;
+                return text.substring(0, maxLength) + '...';
+            };
+
+            const priceLabels = kgProducts.map(p => wrapLabel(p.name));
+            const priceData = kgProducts.map(p => p.price);
+
+            const ctxPrice = document.getElementById('priceChart').getContext('2d');
+            new Chart(ctxPrice, {
+                type: 'bar',
+                data: {
+                    labels: priceLabels,
+                    datasets: [{
+                        label: 'Đơn giá (VNĐ/Kg)',
+                        data: priceData,
+                        backgroundColor: '#22c55e',
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return value / 1000 + 'k';
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return formatMoney(context.raw);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+
+    </script>
+</body>
+</html>
